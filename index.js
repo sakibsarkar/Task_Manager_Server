@@ -169,12 +169,22 @@ async function run() {
         })
 
 
-        // user all todo
+        // user all todo task
         app.get("/api/all/todo", varifyToken, async (req, res) => {
             const { email } = req.user
             const result = await taskCollection.find({
                 user_email: email,
                 status: "To-do"
+            }).toArray()
+
+            res.send(result)
+        })
+        // user all ongoing task
+        app.get("/api/all/ongoing", varifyToken, async (req, res) => {
+            const { email } = req.user
+            const result = await taskCollection.find({
+                user_email: email,
+                status: "Ongoing"
             }).toArray()
 
             res.send(result)
