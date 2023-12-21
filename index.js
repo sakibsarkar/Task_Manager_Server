@@ -161,7 +161,54 @@ async function run() {
 
 
 
+        // delete task
+        app.delete("/api/delete/task", varifyToken, async (req, res) => {
+            const id = req.query.id
+            const result = await taskCollection.deleteOne({ _id: new ObjectId(id) })
+            res.send(result)
+        })
 
+
+        // user all todo
+        app.get("/api/all/todo", varifyToken, async (req, res) => {
+            const { email } = req.user
+            const result = await taskCollection.find({
+                user_email: email,
+                status: "To-do"
+            }).toArray()
+
+            res.send(result)
+        })
+
+
+
+        // single id based todo
+        app.get("/api/single/todo", varifyToken, async (req, res) => {
+            const id = req.query.id
+
+            const result = await taskCollection.findOne({ _id: new ObjectId(id) })
+            res.send(result)
+        })
+
+
+        // update tast
+        app.put("/api/task/update", varifyToken, async (req, res) => {
+
+            const { title, description, deadline, id } = req.body
+            const find = { _id: new ObjectId(id) }
+
+            const update = {
+                $set: {
+                    title: title,
+                    description: description,
+                    deadline: deadline
+                }
+            }
+
+
+            const result = await taskCollection.updateOne(find, update)
+            res.send(result)
+        })
 
 
 
