@@ -40,7 +40,7 @@ const varifyToken = (req, res, next) => {
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.xbiw867.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -98,6 +98,66 @@ async function run() {
             res.send(result)
         })
 
+
+        // get all type task 
+        app.get("/api/all/task", varifyToken, async (req, res) => {
+            const { email } = req.user
+
+            const toDo = await taskCollection.find({
+                user_email: email,
+                status: "To-do"
+            }).toArray()
+
+            const onGoing = await taskCollection.find({
+                user_email: email,
+                status: "Ongoing"
+            }).toArray()
+
+            const completed = await taskCollection.find({
+                user_email: email,
+                status: "Completed"
+            }).toArray()
+
+            res.send({ toDo, onGoing, completed })
+        })
+
+
+
+
+        // change task status in To-do
+        app.put("/api/change/todo", varifyToken, async (req, res) => {
+            const id = req.query.id
+            const result = taskCollection.updateOne({ _id: new ObjectId(id) }, {
+                $set: {
+                    status: "To-do"
+                }
+            })
+            res.send(result)
+        })
+
+
+        // change task status in ongoing
+        app.put("/api/change/ongoing", varifyToken, async (req, res) => {
+            const id = req.query.id
+            const result = taskCollection.updateOne({ _id: new ObjectId(id) }, {
+                $set: {
+                    status: "Ongoing"
+                }
+            })
+            res.send(result)
+        })
+
+
+        // change task status in completed
+        app.put("/api/change/completed", varifyToken, async (req, res) => {
+            const id = req.query.id
+            const result = taskCollection.updateOne({ _id: new ObjectId(id) }, {
+                $set: {
+                    status: "Completed"
+                }
+            })
+            res.send(result)
+        })
 
 
 
