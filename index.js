@@ -87,6 +87,13 @@ async function run() {
             res.send(result)
         })
 
+        // get user info
+        app.get("/api/user", varifyToken, async (req, res) => {
+            const { email } = req.user
+            const result = await userCollection.findOne({ user_email: email })
+            res.send(result)
+        })
+
 
 
         // -------------task related api-----------
@@ -179,12 +186,24 @@ async function run() {
 
             res.send(result)
         })
+
+
         // user all ongoing task
         app.get("/api/all/ongoing", varifyToken, async (req, res) => {
             const { email } = req.user
             const result = await taskCollection.find({
                 user_email: email,
                 status: "Ongoing"
+            }).toArray()
+
+            res.send(result)
+        })
+        // user all completed task
+        app.get("/api/all/completed", varifyToken, async (req, res) => {
+            const { email } = req.user
+            const result = await taskCollection.find({
+                user_email: email,
+                status: "Completed"
             }).toArray()
 
             res.send(result)
